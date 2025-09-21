@@ -11,6 +11,14 @@ body {
     min-height: 100vh;
 }
 
+
+.ascii-image {
+    max-width: 100%; 
+    height: auto;   
+    display: block;
+    margin: 0 auto; 
+}
+
 .ascii-art {
     margin-bottom: 20px;
     padding: 20px;
