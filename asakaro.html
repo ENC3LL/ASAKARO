@@ -1,29 +1,212 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html>
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CRYSTAL</title>
-    <link rel="stylesheet" href="asakaro.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/icofont@1.0.0/dist/icofont.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,100..900;1,100..900&family=Moderustic:wght@300..800&family=Mulish:ital,wght@0,200..1000;1,200..1000&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="ascii-art">
-    <img src="1.png" alt="ASCII Art Crystal" class="ascii-image">
-</div>
-    <div class="content">
-        <h1>CRYSTAL</h1>
-        <p class="version">ver 1.4</p>
-        <p class="description">Скачать MD редактор CRYSTAL</p>
-        <div class="buttons-container">
-            <a href="https://github.com/ENC3LL/enc3ll.github.io/releases/download/update/CRYSTAL.v1.4.zip" download class="btn win-btn">
-                <i class="fab fa-windows"></i> Скачать для Windows
-            </a>
-            <button class="btn mac-btn" disabled>
-                <i class="fab fa-apple"></i> Coming Soon
-            </button>
+
+<div class="main-window">
+    <div id="titlebar" class="titlebar">
+        <div id="titlebar-controls-win" class="titlebar-controls-win">
+            <div id="win-minimize-btn" class="win-control-btn" title="Свернуть"><i class="icofont-minus"></i></div>
+            <div id="win-maximize-btn" class="win-control-btn" title="Развернуть"><i class="icofont-square"></i></div>
+            <div id="win-close-btn" class="win-control-btn close" title="Закрыть"><i class="icofont-close"></i></div>
+        </div>
+        <div id="current-file-name" class="current-file-name"></div>
+    </div>
+    <div class="sidebar">
+        <div class="resize-handle" id="resize-handle"></div>
+        <div class="window-controls">
+            <div id="close-btn" class="control-button close-button"></div>
+            <div id="minimize-btn" class="control-button minimize-button"></div>
+            <div id="maximize-btn" class="control-button maximize-button"></div>
+        </div>
+        <div id="vault-section" class="vault-section hidden">
+            <h2 id="vault-name"></h2>
+            <button id="settings-btn" title="Настройки"><i class="icofont-gear"></i></button>
+            <div class="sidebar-separator"></div>
+
+            <div class="search-container">
+                <i class="icofont-search-1 search-icon"></i>
+                <input type="text" id="sidebar-search-input" placeholder="Поиск...">
+            </div>
+
+            <div id="file-tree" class="file-tree"></div>
+
+            <div class="sidebar-actions">
+
+                <div id="new-item-container" class="new-item-container">
+                    <button id="new-item-btn" title="Создать">
+                        <i class="icofont-plus"></i>
+                        <span>Создать</span>
+                    </button>
+                    <div id="new-item-form" class="new-item-form">
+                        <div class="new-item-type-selector">
+                            <button id="select-note-btn" class="type-btn active" data-type="note" title="Новая заметка"><i class="icofont-ui-file"></i></button>
+                            <button id="select-folder-btn" class="type-btn" data-type="folder" title="Новая папка"><i class="icofont-folder"></i></button>
+                        </div>
+                        <input type="text" id="new-item-input" placeholder="Введите название...">
+                        <div class="new-item-actions">
+                            <button id="save-new-item-btn">Создать</button>
+                        </div>
+                    </div>
+                </div>
+                <button id="close-vault-btn" title="Закрыть хранилище">
+                    <i class="icofont-logout"></i>
+                    <span>Закрыть</span>
+                </button>
+            </div>
         </div>
     </div>
+    <div id="editor-container"></div>
+</div>
+
+<div id="welcome-screen" class="welcome-screen">
+    <div class="welcome-content">
+        <h1><pre class="ascii-art">
+
+            ;ftttttttttff.                 ,fttttttttttttttttttttttttttttf              ;fttttttttttt,            .fttttttt;         tttttttttttttt             ifttttttttttf.            ,ttttttttttttttttttttttttttft                 :ftttttttttf:
+        ;ttttttttttttttttttf             ftttttttttttttttttttttttttttttttt          .ttttttttttttttttttf          .tttttttt:      ittttttttttttttt          ;ttttttttttttttttttt          ,ttttttttttttttttttttttttttttt.            ftttttttttttttttttf.
+      fttttttttttttttttttttttti        :tttttttttttttttttttttttttttttttttt        tttttttttttttttttttttttt1       .tttttttt:   ,1tttttttttttttt           fttttttttttttttttttttttt;       .tttttttttttttttttttttttttttttti        :t1ttttttttttttttttttttti
+    itttttttttttttttttttttttttttt.     ttttttttttttttttttttttttttttttttttt      ;tttttttttttttttttttttttttttt:    .tttttttt, ttttttttttttttt:           ttttttttttttttttttttttttttttf.    .ttttttttttttttttttttttttttttttt.      tt1tttttttttttttttttttttttt,
+   ftttttttttttf;...ittttttttttttttf  ittttttttttttt;ii;;;;;;;;;;;;;;;;ii:     ttttttttttttf;...;ftttttttttttttf  .ttttttttttttttttttttttf             fttttttttttft,...1ttttttttttttttf  ,ttttttt1fiiiiiiiii;;1t1ttttttttt    :tttttttttttf:..,tftttttttttttt
+  fttttttttt1          ttttttttttttf  itttttttttttttttt;                      ttttttttttf          1tttttttttttt  .ttttttttttttttttttft.              tttttttttt:          ftttttttttttt  .tttttttt:             fttttttttt   ,tttttttttf           fttttttttt1
+ ;ttttttttf               fttttttttf   ,ttttttttttttttttttL,                 ,ttttttttt               fttttttttt  .ttttttttttttt,                tttttttttt              .tttttttttt  .tttttttt:             ;ttttttttt   ttttttttt              ,ttttttttt.
+ ttttttttt                 itttttttf       ittttttttttttttttttt              ftttttttt                 .tttttttt  .tttttttttttttt1                   ftttttttt                 1tttttttt  .1ttttttt:             tttttttttt  ,tttttttt.               ,ttttttttt
+ tttttttt1                 itttttttt          .tttttttttttttt1tttf;          ttttttttf                 .fttttttt  .tttttttttttf                      tttttttti                 1tttttttt  .ttttttttf   tfffffffttttttttttt   itttttttf                 ftttttttt
+ ttttttttt                 itttttttf              :ftttttttttttttttttf.      ttttttttf                 .fttttttf   tttttttttttt:                     tttttttt1                 1tttttttf  .ttttttttttt1  tttttttttttttttt    itttttttt                 ftttttttf
+ ftttttttt                 itttttf,                   ttttttttttttttttt1tt   ftttttttt                 .fttttti     .ttttttttttttf.                  ftttttttt                 1tttttti     ,tttttttttttt:  fttttttttttt      tttttttti               1ttttttttt
+ ,ttttttttt                itttttttt                     .fttttttttttttttt,   ttttttttf.               .fttttttt   tttttttttttttttttf                ;ttttttttt                1tttttttt  .ttttttttttttttt1t  ;tttttf,        ftttttttfi             1ttttttttt
+  tttttttttf,             itttttttf                         ;tttttttttttt:   ;tttttttttt,             .fttttttt   tttttttttttttttttttti              ttttttttttf              1tttttttt  .tttttttttttttttttttt                tttttttttt:         itttttttttt.
+   itttttttttttttttftttf   itttttttf  ,ttttttttttttttttttttttttttttttttttt     :tttttttttttttftftttt   .fttttttt  .ttttttttttttttttttttttf,            ttttttttttttttftftttt   itttttttt  ,tttttttttttttttttttttti              tttttttttttttfttttttttttttttf.
+     tttttttttttttttttttt  itttttttt  :ttttttttttttttttttttttttttttttttttt       tttttttttttttttttttt. .fttttttt   tttttttt, .ttttttttttttttf.          .fttttttttttttttttttf  1tttttttt  ,tttttttt; ttttttttttttttt.            ftttttttttttttttttttttttttf
+      ,ftttttttttttttttttt,itttttttt  :tttttttttttttttttttttttttttttttttt1          ttttttttttttttttttt:.fttttttt   ........     ;ttttttttttttttt          ,ttttttttttttttttttt.itttttttt    .......    .fttttttttttttft            ftttttttttttttttttttttf
+         itttttttttttttttttitttttttt  :tttttttttttttttttttttttttttttttt              ;ttttttttttttttttt,tttttttt                   ttttttttttttttt.          1tttttttttttttttttitttttttt                  :1ttttttttttttti           :ttttttttttttttttt:
+             ,1tfttttf1,   .tttttttf  .fttttttttttttttttttttttttttt,                     .itttttfft:    tttttttt                      ftttttttttttt              ,1ffttfff1.   :tttttttt                     ttttttttttttttf             .1fftttfti.
+
+</pre></h1>
+        <h2>朝から</h2>
+        <h3>Добро пожаловать в CRYSTAL</h3>
+        <p>Чтобы начать, создайте новое или откройте существующее хранилище.</p>
+        <div class="welcome-actions">
+            <button id="create-vault-btn" class="welcome-button"> <i class="icofont-plus-circle"></i> Создать </button>
+            <button id="open-vault-btn" class="welcome-button"> <i class="icofont-folder-open"></i> Открыть </button>
+        </div>
+    </div>
+</div>
+
+<div id="custom-context-menu" class="custom-context-menu">
+    <div class="context-menu-item" data-action="copy">Копировать</div>
+    <div class="context-menu-item" data-action="paste">Вставить</div>
+    <div class="context-menu-separator"></div>
+    <div class="context-menu-item has-submenu">Заголовок
+        <div class="submenu">
+            <div class="submenu-item" data-action="format-h1">Заголовок 1</div>
+            <div class="submenu-item" data-action="format-h2">Заголовок 2</div>
+            <div class="submenu-item" data-action="format-h3">Заголовок 3</div>
+        </div>
+    </div>
+    <div class="context-menu-item has-submenu">Списки
+        <div class="submenu">
+            <div class="submenu-item" data-action="format-ul">Маркированный</div>
+            <div class="submenu-item" data-action="format-ol">Нумерованный</div>
+        </div>
+    </div>
+    <div class="context-menu-separator"></div>
+    <div class="context-menu-item" data-action="format-bold">Жирный</div>
+    <div class="context-menu-item" data-action="format-italic">Курсив</div>
+    <div class="context-menu-separator"></div>
+    <div class="context-menu-item" data-action="format-blockquote">Цитата</div>
+    <div class="context-menu-item" data-action="format-hr">Горизонтальная линия</div>
+    <div class="context-menu-item" data-action="format-codeblock">Код-блок</div>
+</div>
+
+<div id="sidebar-context-menu" class="sidebar-context-menu">
+    <div class="context-menu-item" data-action="new-note">Новая заметка</div>
+    <div class="context-menu-item" data-action="new-folder">Новая папка</div>
+    <div class="context-menu-item" data-action="add-pdf-from-url">PDF из ссылки</div>
+    <div class="context-menu-separator"></div>
+    <div class="context-menu-item" data-action="rename">Переименовать</div>
+    <div class="context-menu-item" data-action="share">Поделиться...</div>
+    <div class="context-menu-separator"></div>
+    <div class="context-menu-item delete" data-action="delete">Удалить</div>
+</div>
+
+<div id="modal-overlay" class="modal-overlay hidden">
+    <div id="modal" class="modal">
+        <h3 id="modal-title"></h3>
+        <p id="modal-message" class="hidden"></p>
+        <input type="text" id="modal-input" class="hidden">
+        <div class="modal-buttons">
+            <button id="modal-cancel-btn">Отмена</button>
+            <button id="modal-ok-btn">OK</button>
+        </div>
+    </div>
+</div>
+
+<div id="settings-menu" class="sidebar-context-menu" style="display: none;">
+    <div class="context-menu-item setting-switch-item" data-action="toggle-win-controls">
+        <span>Windows-стиль</span>
+        <label class="switch">
+            <input type="checkbox" id="win-controls-switch">
+            <span class="slider round"></span>
+        </label>
+    </div>
+    <div class="context-menu-item setting-switch-item" data-action="reverse-style">
+        <span>Реверс стиля</span>
+        <label class="switch">
+            <input type="checkbox" id="reverse-style-switch">
+            <span class="slider round"></span>
+        </label>
+    </div>
+    <div class="context-menu-item setting-switch-item" data-action="typing-animation">
+        <span>Анимация ввода</span>
+        <label class="switch">
+            <input type="checkbox" id="typing-animation-switch">
+            <span class="slider round"></span>
+        </label>
+    </div>
+    <div class="context-menu-separator"></div>
+    <div class="context-menu-item" data-action="change-color">Выбрать цвет</div>
+</div>
+
+
+<div id="color-context-menu" class="color-context-menu">
+    <div class="context-menu-item" data-color="#FF0077">
+        <span>Pink star</span>
+    </div>
+    <div class="context-menu-item" data-color="#ad0013">
+        <span>Japan RED</span>
+    </div>
+    <div class="context-menu-item" data-color="#FF8000">
+        <span>Sport orange</span>
+    </div>
+    <div class="context-menu-item" data-color="#FFFFFF">
+        <span>CRYSTAL white</span>
+    </div>
+</div>
+
+<div id="create-context-menu" class="sidebar-context-menu" style="display: none;">
+    <div class="context-menu-item" data-action="new-note">
+        <i class="icofont-file-text"></i> <span>Новая заметка</span>
+    </div>
+    <div class="context-menu-item" data-action="add-pdf-from-url">
+        <i class="icofont-link"></i> <span>PDF из ссылки</span>
+    </div>
+    <div class="context-menu-item" data-action="new-folder">
+        <i class="icofont-folder-open"></i> <span>Новая папка</span>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
 </body>
 </html>
